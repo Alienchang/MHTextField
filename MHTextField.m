@@ -61,15 +61,30 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textFieldDidBeginEditing:) name:UITextFieldTextDidBeginEditingNotification object:self];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textFieldDidEndEditing:) name:UITextFieldTextDidEndEditingNotification object:self];
-   
+    
     
     toolbar = [[UIToolbar alloc] init];
     toolbar.frame = CGRectMake(0, 0, self.window.frame.size.width, 44);
     // set style
     [toolbar setBarStyle:UIBarStyleDefault];
     
-    self.previousBarButton = [[UIBarButtonItem alloc] initWithTitle:@"上一步" style:UIBarButtonItemStyleBordered target:self action:@selector(previousButtonIsClicked:)];
-    self.nextBarButton = [[UIBarButtonItem alloc] initWithTitle:@"下一步" style:UIBarButtonItemStyleBordered target:self action:@selector(nextButtonIsClicked:)];
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    [button setTitleColor:[UIColor colorWithRed:29/255.f green:144/255.f blue:87/255.f alpha:1.f]
+                 forState:UIControlStateNormal];
+    [button setTitle:@"上一步" forState:UIControlStateNormal];
+    button.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:12.0f];
+    button.frame=CGRectMake(0.0, 0.0, 50.0, 25.0);
+    [button addTarget:self action:@selector(previousButtonIsClicked:)  forControlEvents:UIControlEventTouchUpInside];
+    self.previousBarButton = [[UIBarButtonItem alloc] initWithCustomView:button];
+    
+    button = [UIButton buttonWithType:UIButtonTypeCustom];
+    [button setTitleColor:[UIColor colorWithRed:29/255.f green:144/255.f blue:87/255.f alpha:1.f]
+                 forState:UIControlStateNormal];
+    [button setTitle:@"下一步" forState:UIControlStateNormal];
+    button.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:12.0f];
+    button.frame=CGRectMake(0.0, 0.0, 50.0, 25.0);
+    [button addTarget:self action:@selector(nextButtonIsClicked:)  forControlEvents:UIControlEventTouchUpInside];
+    self.nextBarButton = [[UIBarButtonItem alloc] initWithCustomView:button];
     
     UIBarButtonItem *flexBarButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
     UIBarButtonItem *doneBarButton = [[UIBarButtonItem alloc] initWithTitle:@"完成" style:UIBarButtonItemStyleBordered target:self action:@selector(doneButtonIsClicked:)];
@@ -109,7 +124,7 @@
     
     while (!textField.isEnabled && tagIndex < [self.textFields count])
         textField = [self.textFields objectAtIndex:++tagIndex];
-
+    
     [self becomeActive:textField];
 }
 
@@ -135,9 +150,9 @@
     BOOL nexBarButtonEnabled = NO;
     
     for (int index = 0; index < [self.textFields count]; index++) {
-
+        
         UITextField *textField = [self.textFields objectAtIndex:index];
-    
+        
         if (index < tag)
             previousBarButtonEnabled |= textField.isEnabled;
         else if (index > tag)
@@ -192,7 +207,7 @@
     aRect.size.height -= keyboardSize.height + self.toolbar.frame.size.height + 22;
     
     CGPoint textRectBoundary = CGPointMake(textFieldRect.origin.x, textFieldRect.origin.y + textFieldRect.size.height);
-   
+    
     if (!CGRectContainsPoint(aRect, textRectBoundary) || scrollView.contentOffset.y > 0) {
         CGPoint scrollPoint = CGPointMake(0.0, self.superview.frame.origin.y + _textField.frame.origin.y + _textField.frame.size.height - aRect.size.height);
         
@@ -224,7 +239,7 @@
             return NO;
         }
     }
-
+    
     [self setBackgroundColor:[UIColor whiteColor]];
     
     return YES;
@@ -286,7 +301,7 @@
     [self setKeyboardWillHideNotificationObserver:[[NSNotificationCenter defaultCenter] addObserverForName:UIKeyboardWillHideNotification object:nil queue:nil usingBlock:^(NSNotification *notification){
         [self keyboardWillHide:notification];
     }]];
- 
+    
     [self setBarButtonNeedsDisplayAtTag:textField.tag];
     
     if ([self.superview isKindOfClass:[UIScrollView class]] && self.scrollView == nil)
@@ -300,7 +315,7 @@
 
 - (void)textFieldDidEndEditing:(NSNotification *) notification{
     UITextField *textField = (UITextField*)[notification object];
-   
+    
     if (_isDateField && [textField.text isEqualToString:@""] && _isDoneCommand){
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
         
@@ -314,7 +329,7 @@
     }
     
     [self validate];
-
+    
     [self setDoneCommand:NO];
     
     _textField = nil;
